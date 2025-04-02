@@ -79,7 +79,8 @@ const elements: Elements[] = [
     name: 'Search input',
   },
   {
-    locator: (page: Page): Locator => page.getByRole('heading', { name: 'Playwright enables reliable' }),
+    locator: (page: Page): Locator =>
+      page.getByRole('heading', { name: 'Playwright enables reliable' }),
     name: 'Title',
     text: 'Playwright enables reliable end-to-end testing for modern web apps.',
   },
@@ -93,6 +94,8 @@ const elements: Elements[] = [
     },
   },
 ];
+
+const lightModes = ['light', 'dark'];
 
 test.describe('Тесты главной страницы', () => {
   test.beforeEach(async ({ page }) => {
@@ -130,5 +133,14 @@ test.describe('Тесты главной страницы', () => {
   test('Проверка переключения light мода', async ({ page }) => {
     await page.getByRole('button', { name: 'Switch between dark and light' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  });
+
+  lightModes.forEach((value) => {
+    test(`Проверка стилей aктивного ${value} мода`, async ({ page }) => {
+      await page.evaluate((value) => {
+        document.querySelector('html')?.setAttribute('data-theme', value);
+      }, value);
+      await expect(page).toHaveScreenshot(`pageWith${value}Mode.png`);
+    });
   });
 });
